@@ -29,10 +29,14 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun WorkoutAppTheme(content: @Composable () -> Unit) {
+fun AtlasTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = DarkColorScheme,
         typography = WorkoutTypography,
         content = content
     )
 }
+
+// Backward-compat alias so any remaining references compile
+@Composable
+fun WorkoutAppTheme(content: @Composable () -> Unit) = AtlasTheme(content)

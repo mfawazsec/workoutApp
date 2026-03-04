@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.workoutapp.data.entity.DailyTrackingEntity
 import com.workoutapp.data.entity.ExerciseEntity
 import com.workoutapp.data.entity.ProgressionLogEntity
 import com.workoutapp.data.entity.UserExerciseStateEntity
@@ -14,9 +15,10 @@ import com.workoutapp.data.entity.WorkoutSessionEntity
         ExerciseEntity::class,
         WorkoutSessionEntity::class,
         UserExerciseStateEntity::class,
-        ProgressionLogEntity::class
+        ProgressionLogEntity::class,
+        DailyTrackingEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class WorkoutDatabase : RoomDatabase() {
@@ -24,6 +26,7 @@ abstract class WorkoutDatabase : RoomDatabase() {
     abstract fun workoutSessionDao(): WorkoutSessionDao
     abstract fun userExerciseStateDao(): UserExerciseStateDao
     abstract fun progressionLogDao(): ProgressionLogDao
+    abstract fun dailyTrackingDao(): DailyTrackingDao
 
     companion object {
         @Volatile private var INSTANCE: WorkoutDatabase? = null
@@ -34,7 +37,9 @@ abstract class WorkoutDatabase : RoomDatabase() {
                     context.applicationContext,
                     WorkoutDatabase::class.java,
                     "workout_db"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build().also { INSTANCE = it }
             }
         }
     }

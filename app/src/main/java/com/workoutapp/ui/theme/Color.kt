@@ -2,44 +2,54 @@ package com.workoutapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Muscle Group Accent Colors ───────────────────────────────────────────────
-val PushColor           = Color(0xFFFF6B47)   // Warm Orange-Red  — Chest + Triceps
-val PullColor           = Color(0xFF4A90D9)   // Electric Blue    — Back + Biceps
-val LegsColor           = Color(0xFF51C878)   // Emerald Green    — Legs
-val CoreShouldersColor  = Color(0xFFB47FD8)   // Purple           — Core + Shoulders (Rehab)
+// ── Atlas Neon Palette ───────────────────────────────────────────────────────
+val NeonCyan            = Color(0xFF00E5FF)   // Primary neon cyan
+val NeonCyanDim         = Color(0xFF0099AA)   // Dimmed cyan for muted accents
+val NeonCyanGlow        = Color(0x4400E5FF)   // Glow/shadow (44 = 27% alpha)
+val NeonOrange          = Color(0xFFFF6B47)   // PUSH accent
+val NeonBlue            = Color(0xFF4A90D9)   // PULL accent
+val NeonGreen           = Color(0xFF39FF14)   // LEGS accent (neon green)
+val NeonPurple          = Color(0xFFBF5FFF)   // CORE+SHOULDERS accent
+
+// ── Muscle Group Accent Colors (keeping for existing compatibility) ───────────
+val PushColor           = NeonOrange
+val PullColor           = NeonBlue
+val LegsColor           = NeonGreen
+val CoreShouldersColor  = NeonPurple
 
 // ── Rep Zone Colors ──────────────────────────────────────────────────────────
-val StrengthZoneColor   = Color(0xFFFFD93D)   // Yellow
-val HypertrophyColor    = Color(0xFF51C878)   // Green (same as Legs)
-val EnduranceZoneColor  = Color(0xFFFF9F45)   // Orange
-val OutOfRangeColor     = Color(0xFFFF4D4D)   // Red
+val StrengthZoneColor   = Color(0xFFFFD93D)
+val HypertrophyColor    = NeonGreen
+val EnduranceZoneColor  = Color(0xFFFF9F45)
+val OutOfRangeColor     = Color(0xFFFF4D4D)
 
-// ── App Surface Palette (forced dark) ───────────────────────────────────────
-val Background          = Color(0xFF0D0D0D)
-val CardSurface         = Color(0xFF1A1A1A)
-val CardSurfaceElevated = Color(0xFF242424)
+// ── App Surface Palette (OLED Black) ─────────────────────────────────────────
+val Background          = Color(0xFF000000)   // Pure OLED black
+val CardSurface         = Color(0xFF0D0D0D)   // Slightly off-black for cards
+val CardSurfaceElevated = Color(0xFF1A1A1A)   // Elevated card surface
 val OnSurface           = Color(0xFFE8E8E8)
-val OnSurfaceMuted      = Color(0xFF9A9A9A)
-val InactiveChip        = Color(0xFF2C2C2C)
-val Divider             = Color(0xFF2E2E2E)
+val OnSurfaceMuted      = Color(0xFF7A7A7A)
+val InactiveChip        = Color(0xFF1C1C1C)
+val Divider             = Color(0xFF1E1E1E)
 
-// ── Material3 Dark Scheme Seeds ──────────────────────────────────────────────
-val Primary             = Color(0xFFFF6B47)
-val OnPrimary           = Color(0xFF1A0800)
-val PrimaryContainer    = Color(0xFF3D1500)
-val OnPrimaryContainer  = Color(0xFFFFDBCF)
+// ── Material3 Scheme Seeds ────────────────────────────────────────────────────
+val Primary             = NeonCyan
+val OnPrimary           = Color(0xFF000000)
+val PrimaryContainer    = Color(0xFF003340)
+val OnPrimaryContainer  = NeonCyan
 val Secondary           = Color(0xFF4A90D9)
-val OnSecondary         = Color(0xFF00315C)
-val SecondaryContainer  = Color(0xFF004880)
+val OnSecondary         = Color(0xFF000000)
+val SecondaryContainer  = Color(0xFF00315C)
 val OnSecondaryContainer= Color(0xFFD3E4FF)
-val Tertiary            = Color(0xFFB47FD8)
-val OnTertiary          = Color(0xFF360061)
-val TertiaryContainer   = Color(0xFF4E0089)
-val OnTertiaryContainer = Color(0xFFEDD9FF)
+val Tertiary            = NeonPurple
+val OnTertiary          = Color(0xFF000000)
+val TertiaryContainer   = Color(0xFF2A0050)
+val OnTertiaryContainer = NeonPurple
 val Error               = Color(0xFFFF4D4D)
-val OnError             = Color(0xFF690005)
-val Surface             = Color(0xFF0D0D0D)
+val OnError             = Color(0xFF000000)
+val Surface             = Color(0xFF000000)
 val OnSurfaceColor      = Color(0xFFE8E8E8)
-val SurfaceVariant      = Color(0xFF1A1A1A)
-val OnSurfaceVariant    = Color(0xFFCAC4C4)
-val Outline             = Color(0xFF2E2E2E)
+val SurfaceVariant      = Color(0xFF0D0D0D)
+val OnSurfaceVariant    = Color(0xFFAAAAAA)
+val Outline             = Color(0xFF1E1E1E)
+val OutlineVariant      = Color(0xFF2A2A2A)

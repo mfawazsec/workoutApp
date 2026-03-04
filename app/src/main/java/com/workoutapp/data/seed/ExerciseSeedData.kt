@@ -73,6 +73,40 @@ object ExerciseSeedData {
             sortOrder = 6
         ),
 
+        ExerciseEntity(
+            id = "push_incline_db_press_bed",
+            name = "Incline DB Press (Bed)",
+            muscleGroupId = "push",
+            equipment = "Dumbbell, Bed",
+            defaultSets = 4, defaultReps = 10, defaultWeightKg = 10f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 90,
+            notes = "Upper back on bed edge at 30-45 deg. Do NOT lower DBs past torso plane. Upper chest focus.",
+            sortOrder = 7
+        ),
+        ExerciseEntity(
+            id = "push_decline_pushup_bed",
+            name = "Decline Push-Up (Feet on Bed)",
+            muscleGroupId = "push",
+            equipment = "Bodyweight, Bed",
+            defaultSets = 3, defaultReps = 12, defaultWeightKg = 0f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 60,
+            notes = "Feet elevated on bed. Upper chest emphasis. Elbows at 45 deg to body — never flare.",
+            sortOrder = 8
+        ),
+        ExerciseEntity(
+            id = "push_tricep_overhead_ext",
+            name = "Overhead Tricep Extension",
+            muscleGroupId = "push",
+            equipment = "Dumbbell",
+            defaultSets = 3, defaultReps = 12, defaultWeightKg = 8f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 60,
+            notes = "Seated or lying. Arms alongside ears, elbows pointing forward. Maximises long-head tricep stretch.",
+            sortOrder = 9
+        ),
+
         // ── PULL: Back + Biceps ─────────────────────────────────────────────
         // Horizontal pulls ONLY — no overhead pulling (shoulder safety)
         ExerciseEntity(
@@ -140,6 +174,62 @@ object ExerciseSeedData {
             hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 60,
             notes = "Underhand grip on the row. Greater bicep involvement.",
             sortOrder = 6
+        ),
+
+        ExerciseEntity(
+            id = "pull_single_arm_row_bed",
+            name = "Single-Arm Row (Bed Support)",
+            muscleGroupId = "pull",
+            equipment = "Dumbbell, Bed",
+            defaultSets = 4, defaultReps = 10, defaultWeightKg = 12f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 90,
+            notes = "Hand and knee braced on bed edge. Heavier load, deeper stretch at the bottom.",
+            sortOrder = 7
+        ),
+        ExerciseEntity(
+            id = "pull_prone_y_raise",
+            name = "Prone Y-Raise",
+            muscleGroupId = "pull",
+            equipment = "Dumbbell, Mat",
+            defaultSets = 3, defaultReps = 15, defaultWeightKg = 2f,
+            tempoEccentric = 2, tempoBottomPause = 0, tempoConcentric = 2, tempoTopPause = 2,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
+            notes = "Lie prone. Arms form a Y overhead at 45 deg. Very light weight. Lower trap + rear delt rehab.",
+            sortOrder = 8
+        ),
+        ExerciseEntity(
+            id = "pull_prone_w_raise",
+            name = "Prone W-Raise",
+            muscleGroupId = "pull",
+            equipment = "Dumbbell, Mat",
+            defaultSets = 3, defaultReps = 15, defaultWeightKg = 2f,
+            tempoEccentric = 2, tempoBottomPause = 0, tempoConcentric = 2, tempoTopPause = 2,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
+            notes = "Lie prone. Elbows at 90 deg in W-shape. Externally rotate upward. Critical anterior shoulder rehab.",
+            sortOrder = 9
+        ),
+        ExerciseEntity(
+            id = "pull_incline_curl_bed",
+            name = "Incline Curl (Bed Reclined)",
+            muscleGroupId = "pull",
+            equipment = "Dumbbell, Bed",
+            defaultSets = 3, defaultReps = 12, defaultWeightKg = 8f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 60,
+            notes = "Reclined at 45 deg. Shoulder extended = long-head bicep stretch. Best length-tension position.",
+            sortOrder = 10
+        ),
+        ExerciseEntity(
+            id = "pull_concentration_curl",
+            name = "Concentration Curl",
+            muscleGroupId = "pull",
+            equipment = "Dumbbell",
+            defaultSets = 3, defaultReps = 12, defaultWeightKg = 8f,
+            tempoEccentric = 3, tempoBottomPause = 0, tempoConcentric = 2, tempoTopPause = 1,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
+            notes = "Seated, elbow braced on inner thigh. Fully isolates bicep. Supinate at top for full contraction.",
+            sortOrder = 11
         ),
 
         // ── LEGS: Quads / Hamstrings / Glutes ───────────────────────────────
@@ -210,6 +300,73 @@ object ExerciseSeedData {
             sortOrder = 6
         ),
 
+        ExerciseEntity(
+            id = "legs_bulgarian_split_squat_bed",
+            name = "Bulgarian Split Squat (Bed)",
+            muscleGroupId = "legs",
+            equipment = "Dumbbell, Bed",
+            defaultSets = 4, defaultReps = 10, defaultWeightKg = 8f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 90,
+            notes = "Rear foot elevated on bed. Deep quad stretch. Upright torso = quad; forward lean = glute.",
+            sortOrder = 7
+        ),
+        ExerciseEntity(
+            id = "legs_wall_sit",
+            name = "Wall Sit",
+            muscleGroupId = "legs",
+            equipment = "Bodyweight",
+            defaultSets = 3, defaultReps = 1, defaultWeightKg = 0f,
+            tempoEccentric = 0, tempoBottomPause = 0, tempoConcentric = 0, tempoTopPause = 0,
+            hasTempoGuidance = false, isShoulderSafe = true, restSeconds = 60,
+            notes = "Back flat to wall, thighs parallel to floor. Hold 30-60s. High TUT, zero shoulder demand.",
+            sortOrder = 8
+        ),
+        ExerciseEntity(
+            id = "legs_hamstring_curl_bed",
+            name = "Prone Hamstring Curl (Bed-Anchored)",
+            muscleGroupId = "legs",
+            equipment = "Bodyweight, Bed",
+            defaultSets = 3, defaultReps = 10, defaultWeightKg = 0f,
+            tempoEccentric = 3, tempoBottomPause = 0, tempoConcentric = 2, tempoTopPause = 1,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 60,
+            notes = "Lie prone, hook heels under bed base overhang. Curl heels toward glutes. Pair with RDLs.",
+            sortOrder = 9
+        ),
+        ExerciseEntity(
+            id = "legs_single_leg_rdl",
+            name = "Single-Leg RDL",
+            muscleGroupId = "legs",
+            equipment = "Dumbbell",
+            defaultSets = 3, defaultReps = 10, defaultWeightKg = 8f,
+            tempoEccentric = 3, tempoBottomPause = 1, tempoConcentric = 2, tempoTopPause = 0,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 60,
+            notes = "Hinge on one leg, free leg swings back as counterbalance. Light load — control over weight.",
+            sortOrder = 10
+        ),
+        ExerciseEntity(
+            id = "legs_hip_thrust_bed",
+            name = "Hip Thrust (Bed-Elevated)",
+            muscleGroupId = "legs",
+            equipment = "Dumbbell, Bed",
+            defaultSets = 4, defaultReps = 12, defaultWeightKg = 14f,
+            tempoEccentric = 2, tempoBottomPause = 0, tempoConcentric = 1, tempoTopPause = 2,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 90,
+            notes = "Upper back on bed edge at shoulder-blade height. DB on hips. Drive to ceiling, 2s squeeze at top.",
+            sortOrder = 11
+        ),
+        ExerciseEntity(
+            id = "legs_calf_raise_single",
+            name = "Single-Leg Calf Raise",
+            muscleGroupId = "legs",
+            equipment = "Dumbbell",
+            defaultSets = 4, defaultReps = 15, defaultWeightKg = 10f,
+            tempoEccentric = 3, tempoBottomPause = 2, tempoConcentric = 1, tempoTopPause = 2,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
+            notes = "Stand on one foot. DB in same-side hand. Full stretch at bottom (2s), full rise at top (2s squeeze).",
+            sortOrder = 12
+        ),
+
         // ── CORE + SHOULDERS (Rehab-Safe) ───────────────────────────────────
         // No overhead press. No upright rows. Rehab-focused shoulder work only.
         ExerciseEntity(
@@ -277,6 +434,39 @@ object ExerciseSeedData {
             hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
             notes = "Prone on floor. Lift chest and legs simultaneously. Posterior chain + scapular retraction.",
             sortOrder = 6
+        ),
+        ExerciseEntity(
+            id = "core_side_plank",
+            name = "Side Plank",
+            muscleGroupId = "core_shoulders",
+            equipment = "Bodyweight, Mat",
+            defaultSets = 3, defaultReps = 1, defaultWeightKg = 0f,
+            tempoEccentric = 0, tempoBottomPause = 0, tempoConcentric = 0, tempoTopPause = 0,
+            hasTempoGuidance = false, isShoulderSafe = true, restSeconds = 45,
+            notes = "Lie on forearm. Body in straight line. Hold 20-40s per side. Anti-lateral flexion core work.",
+            sortOrder = 7
+        ),
+        ExerciseEntity(
+            id = "core_external_rotation_lying",
+            name = "Side-Lying External Rotation",
+            muscleGroupId = "core_shoulders",
+            equipment = "Dumbbell, Mat",
+            defaultSets = 3, defaultReps = 15, defaultWeightKg = 2f,
+            tempoEccentric = 2, tempoBottomPause = 0, tempoConcentric = 2, tempoTopPause = 2,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
+            notes = "Lie on non-working side. Elbow at 90 deg tucked to ribs. Rotate forearm upward. 1-3 kg only. Critical anterior dislocation rehab.",
+            sortOrder = 8
+        ),
+        ExerciseEntity(
+            id = "core_front_raise_neutral",
+            name = "Neutral-Grip Front Raise",
+            muscleGroupId = "core_shoulders",
+            equipment = "Dumbbell",
+            defaultSets = 3, defaultReps = 12, defaultWeightKg = 5f,
+            tempoEccentric = 3, tempoBottomPause = 0, tempoConcentric = 2, tempoTopPause = 1,
+            hasTempoGuidance = true, isShoulderSafe = true, restSeconds = 45,
+            notes = "Palms facing each other (neutral grip). Raise to shoulder height only. Pure sagittal-plane — no external rotation stress.",
+            sortOrder = 9
         )
     )
 }
