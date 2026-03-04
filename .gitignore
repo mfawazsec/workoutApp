@@ -1,0 +1,17 @@
+# Android build outputs
+build/
+app/build/
+.gradle/
+
+# Local config — never commit (contains SDK path)
+local.properties
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# Generated
+app/src/main/java/com/workoutapp/data/db/WorkoutDatabase_Impl.kt
