@@ -20,7 +20,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val workoutRepo = WorkoutRepository(
         db.workoutSessionDao(),
         db.userExerciseStateDao(),
-        db.progressionLogDao()
+        db.progressionLogDao(),
+        db.exerciseSnapshotDao()
     )
 
     private val _selectedGroups = MutableStateFlow<Set<MuscleGroup>>(emptySet())
@@ -50,13 +51,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val sevenDaysAgo = LocalDate.now().minusDays(7).toEpochDay()
         val recentSessions = workoutRepo.getSessionsSince(sevenDaysAgo)
 
-        val recentGroupIds = recentSessions
-            .flatMap { it.muscleGroupIds.split(",").filter { id -> id.isNotBlank() } }
-
-        val lastTrained = recentGroupIds
-            .groupBy { it }
-            .maxByOrNull { it.value.size }
-            ?.key
+        val lastTrained = recentSessions
+            .maxByOrNull { it.startedAtMs }
+            ?.muscleGroupIds
+            ?.split(",")
+            ?.firstOrNull { it.isNotBlank() }
 
         val suggestion = when (lastTrained) {
             "push"           -> listOf(MuscleGroup.PULL, MuscleGroup.CORE_SHOULDERS)

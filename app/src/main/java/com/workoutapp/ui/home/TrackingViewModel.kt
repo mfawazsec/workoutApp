@@ -56,4 +56,18 @@ class TrackingViewModel(application: Application) : AndroidViewModel(application
             dao.upsert(current.copy(creatineServings = servings.coerceAtLeast(0)))
         }
     }
+
+    fun addMultivitamin(delta: Int) {
+        viewModelScope.launch {
+            val current = todayTracking.value
+            dao.upsert(current.copy(multivitaminTaken = (current.multivitaminTaken + delta).coerceIn(0, 1)))
+        }
+    }
+
+    fun setMultivitamin(value: Int) {
+        viewModelScope.launch {
+            val current = todayTracking.value
+            dao.upsert(current.copy(multivitaminTaken = value.coerceIn(0, 1)))
+        }
+    }
 }

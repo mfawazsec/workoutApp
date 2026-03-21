@@ -9,5 +9,6 @@ data class WorkoutSessionEntity(
     val dateEpochDay: Long,
     val muscleGroupIds: String,
     val exerciseIds: String,
+    val startedAtMs: Long = 0L,
     val completedAt: Long? = null
 )

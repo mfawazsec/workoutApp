@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.workoutapp.ui.calendar.CalendarScreen
+import com.workoutapp.ui.history.HistoryScreen
 import com.workoutapp.ui.home.HomeScreen
 import com.workoutapp.ui.suggest.SuggestScreen
 import com.workoutapp.ui.theme.*
@@ -33,6 +34,7 @@ object Routes {
     private const val WORKOUT_BASE = "workout"
     const val WORKOUT = "$WORKOUT_BASE/{muscleGroupIds}"
     const val CALENDAR = "calendar"
+    const val HISTORY = "history"
     const val SUGGEST = "suggest"
 
     fun workoutRoute(muscleGroupIds: List<String>): String =
@@ -56,19 +58,10 @@ fun WorkoutNavGraph(navController: NavHostController) {
                     scope.launch { drawerState.close() }
                     navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = false } }
                 },
-                onNavigateToHistoryWorkout = {
+                onNavigateToHistory = {
                     scope.launch { drawerState.close() }
-                    // Future: navigate to workout history screen
-                },
-                onNavigateToHistoryWater = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Routes.CALENDAR)
-                },
-                onNavigateToHistoryCreatine = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Routes.CALENDAR)
-                },
-                onClose = { scope.launch { drawerState.close() } }
+                    navController.navigate(Routes.HISTORY)
+                }
             )
         },
         scrimColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f)
@@ -113,6 +106,9 @@ fun WorkoutNavGraph(navController: NavHostController) {
             composable(Routes.CALENDAR) {
                 CalendarScreen(onNavigateBack = { navController.popBackStack() })
             }
+            composable(Routes.HISTORY) {
+                HistoryScreen(onNavigateBack = { navController.popBackStack() })
+            }
             composable(Routes.SUGGEST) {
                 SuggestScreen(
                     onStartWorkout = { groups ->
@@ -128,10 +124,7 @@ fun WorkoutNavGraph(navController: NavHostController) {
 @Composable
 private fun AtlasDrawerContent(
     onNavigateToWorkout: () -> Unit,
-    onNavigateToHistoryWorkout: () -> Unit,
-    onNavigateToHistoryWater: () -> Unit,
-    onNavigateToHistoryCreatine: () -> Unit,
-    onClose: () -> Unit
+    onNavigateToHistory: () -> Unit
 ) {
     ModalDrawerSheet(
         modifier = Modifier.width(280.dp),
@@ -152,9 +145,7 @@ private fun AtlasDrawerContent(
         Spacer(Modifier.height(8.dp))
 
         DrawerItem(icon = Icons.Default.FitnessCenter, label = "WORKOUT", onClick = onNavigateToWorkout)
-        DrawerItem(icon = Icons.Default.History, label = "HISTORY — WORKOUT", onClick = onNavigateToHistoryWorkout)
-        DrawerItem(icon = Icons.Default.WaterDrop, label = "HISTORY — WATER", onClick = onNavigateToHistoryWater)
-        DrawerItem(icon = Icons.Default.Science, label = "HISTORY — CREATINE", onClick = onNavigateToHistoryCreatine)
+        DrawerItem(icon = Icons.Default.History, label = "HISTORY", onClick = onNavigateToHistory)
     }
 }
 

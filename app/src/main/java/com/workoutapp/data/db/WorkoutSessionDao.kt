@@ -20,4 +20,10 @@ interface WorkoutSessionDao {
 
     @Query("UPDATE workout_sessions SET completedAt = :epochMillis WHERE sessionId = :sessionId")
     suspend fun markCompleted(sessionId: String, epochMillis: Long)
+
+    @Query("SELECT * FROM workout_sessions WHERE muscleGroupIds = :dayKey AND completedAt IS NOT NULL ORDER BY dateEpochDay DESC LIMIT 1")
+    suspend fun getLastCompletedSessionForDayKey(dayKey: String): WorkoutSessionEntity?
+
+    @Query("SELECT * FROM workout_sessions WHERE completedAt IS NOT NULL ORDER BY dateEpochDay DESC LIMIT 50")
+    fun getCompletedSessions(): Flow<List<WorkoutSessionEntity>>
 }

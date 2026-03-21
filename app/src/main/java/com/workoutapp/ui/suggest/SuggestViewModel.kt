@@ -15,7 +15,8 @@ class SuggestViewModel(application: Application) : AndroidViewModel(application)
     private val workoutRepo = WorkoutRepository(
         db.workoutSessionDao(),
         db.userExerciseStateDao(),
-        db.progressionLogDao()
+        db.progressionLogDao(),
+        db.exerciseSnapshotDao()
     )
 
     private val _suggestedGroups = MutableStateFlow<List<MuscleGroup>>(emptyList())
@@ -32,34 +33,32 @@ class SuggestViewModel(application: Application) : AndroidViewModel(application)
         val sevenDaysAgo = LocalDate.now().minusDays(7).toEpochDay()
         val recentSessions = workoutRepo.getSessionsSince(sevenDaysAgo)
 
-        val recentGroupIds = recentSessions
-            .flatMap { it.muscleGroupIds.split(",").filter { id -> id.isNotBlank() } }
-
-        val lastTrained = recentGroupIds
-            .groupBy { it }
-            .maxByOrNull { it.value.size }
-            ?.key
+        val lastTrained = recentSessions
+            .maxByOrNull { it.startedAtMs }
+            ?.muscleGroupIds
+            ?.split(",")
+            ?.firstOrNull { it.isNotBlank() }
 
         val (suggestion, reason) = when (lastTrained) {
             "push" -> Pair(
-                listOf(MuscleGroup.PULL, MuscleGroup.CORE_SHOULDERS),
-                "You last trained PUSH. Time to balance with PULL and CORE."
+                listOf(MuscleGroup.PULL),
+                "You last trained PUSH. Time for PULL."
             )
             "pull" -> Pair(
-                listOf(MuscleGroup.LEGS, MuscleGroup.CORE_SHOULDERS),
-                "You last trained PULL. Hit LEGS and CORE today."
+                listOf(MuscleGroup.LEGS),
+                "You last trained PULL. Hit LEGS today."
             )
             "legs" -> Pair(
-                listOf(MuscleGroup.PUSH, MuscleGroup.CORE_SHOULDERS),
-                "Legs day done. Time for upper body — PUSH and CORE."
+                listOf(MuscleGroup.CORE_SHOULDERS),
+                "Legs day done. Time for CORE + SHOULDERS."
             )
             "core_shoulders" -> Pair(
-                listOf(MuscleGroup.PUSH, MuscleGroup.LEGS),
-                "Core work done. Balance with PUSH and LEGS today."
+                listOf(MuscleGroup.PUSH),
+                "Core work done. Time for PUSH."
             )
             else -> Pair(
-                listOf(MuscleGroup.PUSH, MuscleGroup.CORE_SHOULDERS),
-                "No recent sessions found. Starting fresh with PUSH and CORE."
+                listOf(MuscleGroup.PUSH),
+                "No recent sessions found. Starting fresh with PUSH."
             )
         }
         _suggestedGroups.value = suggestion

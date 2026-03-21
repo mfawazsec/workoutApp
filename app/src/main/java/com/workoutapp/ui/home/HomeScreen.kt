@@ -6,6 +6,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -19,6 +20,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +30,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.workoutapp.data.model.MuscleGroup
 import com.workoutapp.ui.theme.*
+import com.workoutapp.ui.workout.MuscleRegionIcons
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+private val HERO_DATE_FMT = DateTimeFormatter.ofPattern("EEEE, d MMM", Locale.getDefault())
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,27 +49,25 @@ fun HomeScreen(
 ) {
     val todayTracking by trackingViewModel.todayTracking.collectAsState()
     val waterGoal by trackingViewModel.waterGoal.collectAsState()
+    val suggestedGroups by homeViewModel.suggestedGroups.collectAsState()
 
     var showWaterPicker by remember { mutableStateOf(false) }
     var showCreatinePicker by remember { mutableStateOf(false) }
+    var showMultivitaminPicker by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = Background,
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        "ATLAS",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = 4.sp,
-                            color = NeonCyan
-                        )
-                    )
-                },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = NeonCyan)
+                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = OnSurface)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenCalendar) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar", tint = OnSurfaceVariant)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
@@ -70,141 +78,442 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            // Tracker cards row
+
+            // ── Hero card ────────────────────────────────────────────────
+            item {
+                HeroCard(
+                    suggestedGroups = suggestedGroups,
+                    onStartSuggested = { onStartWorkout(suggestedGroups) },
+                    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 20.dp)
+                )
+            }
+
+            // ── Tracker rows ─────────────────────────────────────────────
+            item {
+                CompactTrackerCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    label = "WATER",
+                    current = todayTracking.waterGlasses,
+                    goal = waterGoal,
+                    unit = "/ $waterGoal glasses",
+                    accentColor = NeonCyan,
+                    onIncrement = { trackingViewModel.addWater(1) },
+                    onDecrement = { trackingViewModel.addWater(-1) },
+                    onLongPress = { showWaterPicker = true }
+                )
+            }
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    TrackerCard(
-                        modifier = Modifier.weight(1f),
-                        label = "WATER",
-                        current = todayTracking.waterGlasses,
-                        goal = waterGoal,
-                        unit = "glasses",
-                        accentColor = NeonCyan,
-                        onIncrement = { trackingViewModel.addWater(1) },
-                        onDecrement = { trackingViewModel.addWater(-1) },
-                        onLongPress = { showWaterPicker = true }
-                    )
-                    TrackerCard(
+                    CompactTrackerCard(
                         modifier = Modifier.weight(1f),
                         label = "CREATINE",
-                        current = todayTracking.creatineServings,
-                        goal = 1,
-                        unit = if (todayTracking.creatineServings == 1) "serving" else "servings",
+                        current = todayTracking.creatineServings * 3,
+                        goal = 3,
+                        unit = "g",
                         accentColor = NeonPurple,
                         onIncrement = { trackingViewModel.addCreatine(1) },
                         onDecrement = { trackingViewModel.addCreatine(-1) },
-                        onLongPress = { showCreatinePicker = true },
-                        showGrams = true,
-                        gramsPerServing = 3
+                        onLongPress = { showCreatinePicker = true }
+                    )
+                    CompactTrackerCard(
+                        modifier = Modifier.weight(1f),
+                        label = "MULTIVITAMIN",
+                        current = todayTracking.multivitaminTaken,
+                        goal = 1,
+                        unit = "/ 1",
+                        accentColor = NeonGreen,
+                        onIncrement = { trackingViewModel.addMultivitamin(1) },
+                        onDecrement = { trackingViewModel.addMultivitamin(-1) },
+                        onLongPress = { showMultivitaminPicker = true }
                     )
                 }
             }
 
-            // Workouts header
+            // ── Workouts header ──────────────────────────────────────────
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 28.dp, bottom = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         "WORKOUTS",
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 2.sp,
-                            color = OnSurface
+                            color = OnSurface,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 3.sp
                         )
                     )
-                    IconButton(onClick = onOpenCalendar) {
-                        Icon(
-                            Icons.Default.CalendarMonth,
-                            contentDescription = "Calendar",
-                            tint = NeonCyan
+                    Text(
+                        "tap to start",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = OnSurfaceMuted,
+                            letterSpacing = 0.5.sp
                         )
+                    )
+                }
+            }
+
+            // ── Workout grid (2 × 2) ─────────────────────────────────────
+            val groups = MuscleGroup.entries.toList()
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    groups.getOrNull(0)?.let { g ->
+                        WorkoutCard(group = g, modifier = Modifier.weight(1f), onClick = { onStartWorkout(listOf(g)) })
+                    }
+                    groups.getOrNull(1)?.let { g ->
+                        WorkoutCard(group = g, modifier = Modifier.weight(1f), onClick = { onStartWorkout(listOf(g)) })
+                    }
+                }
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    groups.getOrNull(2)?.let { g ->
+                        WorkoutCard(group = g, modifier = Modifier.weight(1f), onClick = { onStartWorkout(listOf(g)) })
+                    }
+                    groups.getOrNull(3)?.let { g ->
+                        WorkoutCard(group = g, modifier = Modifier.weight(1f), onClick = { onStartWorkout(listOf(g)) })
                     }
                 }
             }
 
-            // Workout type buttons
-            items(MuscleGroup.entries.size) { index ->
-                val group = MuscleGroup.entries[index]
-                WorkoutTypeButton(
-                    group = group,
-                    onClick = { onStartWorkout(listOf(group)) }
-                )
-            }
-
-            // SUGGEST button
+            // ── Suggest button ───────────────────────────────────────────
             item {
-                Spacer(modifier = Modifier.height(4.dp))
                 Button(
                     onClick = onOpenSuggest,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 24.dp)
                         .height(52.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    ),
-                    border = BorderStroke(1.dp, NeonCyan),
-                    shape = RoundedCornerShape(8.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
                         Icons.Default.AutoAwesome,
                         contentDescription = null,
                         tint = NeonCyan,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.size(18.dp)
                     )
+                    Spacer(Modifier.width(8.dp))
                     Text(
-                        "SUGGEST",
+                        "TODAY'S SUGGESTION",
                         color = NeonCyan,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp
+                        letterSpacing = 2.sp,
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
 
-    // Water picker bottom sheet
     if (showWaterPicker) {
         NumberPickerBottomSheet(
             title = "Set Water Intake",
             current = todayTracking.waterGlasses,
-            min = 0,
-            max = 20,
-            onConfirm = { value ->
-                trackingViewModel.setWater(value)
-                showWaterPicker = false
-            },
+            min = 0, max = 20,
+            onConfirm = { value -> trackingViewModel.setWater(value); showWaterPicker = false },
             onDismiss = { showWaterPicker = false }
         )
     }
-
-    // Creatine picker bottom sheet
     if (showCreatinePicker) {
         NumberPickerBottomSheet(
             title = "Set Creatine Servings",
             current = todayTracking.creatineServings,
-            min = 0,
-            max = 5,
-            onConfirm = { value ->
-                trackingViewModel.setCreatine(value)
-                showCreatinePicker = false
-            },
+            min = 0, max = 5,
+            onConfirm = { value -> trackingViewModel.setCreatine(value); showCreatinePicker = false },
             onDismiss = { showCreatinePicker = false }
+        )
+    }
+    if (showMultivitaminPicker) {
+        NumberPickerBottomSheet(
+            title = "Set Multivitamin",
+            current = todayTracking.multivitaminTaken,
+            min = 0, max = 1,
+            onConfirm = { value -> trackingViewModel.setMultivitamin(value); showMultivitaminPicker = false },
+            onDismiss = { showMultivitaminPicker = false }
         )
     }
 }
 
+// ── Hero card ────────────────────────────────────────────────────────────────
+
 @Composable
-private fun TrackerCard(
+private fun HeroCard(
+    suggestedGroups: List<MuscleGroup>,
+    onStartSuggested: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val heroResId = remember {
+        context.resources.getIdentifier("ic_hero_atlas", "drawable", context.packageName)
+    }
+    val primaryColor = suggestedGroups.firstOrNull()?.color ?: NeonCyan
+    val today = LocalDate.now().format(HERO_DATE_FMT).uppercase()
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(220.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .border(BorderStroke(1.dp, primaryColor.copy(alpha = 0.35f)), RoundedCornerShape(24.dp))
+    ) {
+        // Background: image or gradient
+        if (heroResId != 0) {
+            Image(
+                painter = painterResource(heroResId),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f to (if (heroResId != 0) Color.Black.copy(alpha = 0.3f) else primaryColor.copy(alpha = 0.25f)),
+                            0.45f to (if (heroResId != 0) Color.Black.copy(alpha = 0.55f) else Color.Black.copy(alpha = 0.7f)),
+                            1.0f to Color.Black.copy(alpha = 0.92f)
+                        )
+                    )
+                )
+        )
+
+        // Neon corner accent
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .align(Alignment.TopEnd)
+                .background(
+                    Brush.radialGradient(
+                        listOf(primaryColor.copy(alpha = 0.25f), Color.Transparent)
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Top: date + label
+            Column {
+                Text(
+                    today,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = primaryColor,
+                        letterSpacing = 2.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "GET\nAFTER IT.",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = (-0.5).sp,
+                        lineHeight = 38.sp
+                    )
+                )
+            }
+
+            // Bottom: suggested groups + button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Column {
+                    Text(
+                        "SUGGESTED",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = OnSurfaceMuted,
+                            letterSpacing = 1.5.sp
+                        )
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        suggestedGroups.forEach { group ->
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = group.color.copy(alpha = 0.2f),
+                                border = BorderStroke(1.dp, group.color.copy(alpha = 0.5f))
+                            ) {
+                                Text(
+                                    group.displayName,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = group.color,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 10.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                Button(
+                    onClick = onStartSuggested,
+                    colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text(
+                        "START",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ── Workout category card ─────────────────────────────────────────────────────
+
+@Composable
+private fun WorkoutCard(
+    group: MuscleGroup,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val context = LocalContext.current
+    val imageResName = "ic_workout_${group.id}"
+    val imageResId = remember(imageResName) {
+        context.resources.getIdentifier(imageResName, "drawable", context.packageName)
+    }
+    val accentColor = group.color
+
+    Box(
+        modifier = modifier
+            .height(175.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .border(BorderStroke(1.dp, accentColor.copy(alpha = 0.35f)), RoundedCornerShape(20.dp))
+            .clickable { onClick() }
+    ) {
+        // Background
+        if (imageResId != 0) {
+            Image(
+                painter = painterResource(imageResId),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.7f
+            )
+        }
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        colorStops = if (imageResId != 0) arrayOf(
+                            0.0f to Color.Black.copy(alpha = 0.25f),
+                            0.5f to Color.Black.copy(alpha = 0.5f),
+                            1.0f to Color.Black.copy(alpha = 0.88f)
+                        ) else arrayOf(
+                            0.0f to accentColor.copy(alpha = 0.18f),
+                            1.0f to Color.Black.copy(alpha = 0.75f)
+                        )
+                    )
+                )
+        )
+
+        // Top-left glow accent
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .align(Alignment.TopStart)
+                .background(
+                    Brush.radialGradient(
+                        listOf(accentColor.copy(alpha = 0.3f), Color.Transparent)
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Muscle region icons at the top
+            MuscleRegionIcons(
+                group = group,
+                iconSize = 22.dp,
+                spacing = 3.dp
+            )
+
+            // Name + subtitle at bottom
+            Column {
+                Text(
+                    group.displayName,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 1.sp
+                    )
+                )
+                Text(
+                    group.subtitle,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = accentColor.copy(alpha = 0.85f),
+                        fontSize = 9.sp
+                    )
+                )
+            }
+        }
+
+        // ChevronRight top-right
+        Icon(
+            Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = accentColor.copy(alpha = 0.6f),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .size(16.dp)
+        )
+    }
+}
+
+// ── Compact tracker card ─────────────────────────────────────────────────────
+
+@Composable
+private fun CompactTrackerCard(
     modifier: Modifier = Modifier,
     label: String,
     current: Int,
@@ -213,9 +522,7 @@ private fun TrackerCard(
     accentColor: Color,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
-    onLongPress: () -> Unit,
-    showGrams: Boolean = false,
-    gramsPerServing: Int = 3
+    onLongPress: () -> Unit
 ) {
     val progress = if (goal > 0) (current.toFloat() / goal).coerceIn(0f, 1f) else 0f
     val animatedProgress by animateFloatAsState(
@@ -228,82 +535,84 @@ private fun TrackerCard(
         animationSpec = tween(300),
         label = "count"
     )
+    val isGoalMet = progress >= 1f
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.3f))
+        border = BorderStroke(1.dp, accentColor.copy(alpha = if (isGoalMet) 0.6f else 0.2f))
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                label,
-                style = MaterialTheme.typography.labelSmall.copy(
-                    color = accentColor,
-                    letterSpacing = 1.5.sp,
-                    fontWeight = FontWeight.Bold
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = accentColor,
+                        letterSpacing = 1.5.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
-            )
+                if (isGoalMet) {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = if (showGrams) "${animatedCount * gramsPerServing}g" else "$animatedCount",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        color = accentColor,
+                    "$animatedCount",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = if (isGoalMet) accentColor else OnSurface,
                         fontWeight = FontWeight.Black
                     )
                 )
-                Row {
-                    // Minus button
+                Text(
+                    unit,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = OnSurfaceMuted,
+                        fontSize = 9.sp
+                    )
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = onDecrement,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(28.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Remove,
-                            contentDescription = "Remove",
-                            tint = accentColor.copy(alpha = 0.7f),
-                            modifier = Modifier.size(18.dp)
-                        )
+                        Icon(Icons.Default.Remove, contentDescription = null,
+                            tint = accentColor.copy(alpha = 0.7f), modifier = Modifier.size(14.dp))
                     }
-                    // Plus button with long-press
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(4.dp))
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(6.dp))
                             .background(accentColor.copy(alpha = 0.15f))
                             .pointerInput(Unit) {
-                                detectTapGestures(
-                                    onTap = { onIncrement() },
-                                    onLongPress = { onLongPress() }
-                                )
+                                detectTapGestures(onTap = { onIncrement() }, onLongPress = { onLongPress() })
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Add",
-                            tint = accentColor,
-                            modifier = Modifier.size(18.dp)
-                        )
+                        Icon(Icons.Default.Add, contentDescription = null,
+                            tint = accentColor, modifier = Modifier.size(14.dp))
                     }
                 }
             }
-            Text(
-                "$current / $goal $unit",
-                style = MaterialTheme.typography.bodySmall.copy(color = OnSurfaceMuted)
-            )
             // Progress bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp)
+                    .height(3.dp)
                     .clip(RoundedCornerShape(2.dp))
                     .background(CardSurfaceElevated)
             ) {
@@ -312,61 +621,14 @@ private fun TrackerCard(
                         .fillMaxHeight()
                         .fillMaxWidth(animatedProgress)
                         .clip(RoundedCornerShape(2.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                colors = listOf(accentColor.copy(alpha = 0.7f), accentColor)
-                            )
-                        )
+                        .background(Brush.horizontalGradient(listOf(accentColor.copy(0.6f), accentColor)))
                 )
             }
         }
     }
 }
 
-@Composable
-private fun WorkoutTypeButton(
-    group: MuscleGroup,
-    onClick: () -> Unit
-) {
-    val accentColor = when (group.id) {
-        "push" -> NeonOrange
-        "pull" -> NeonBlue
-        "legs" -> NeonGreen
-        "core_shoulders" -> NeonPurple
-        else -> NeonCyan
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.4f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                group.displayName,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = OnSurface,
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 1.sp
-                )
-            )
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = accentColor
-            )
-        }
-    }
-}
+// ── Number picker bottom sheet (unchanged) ───────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -396,39 +658,25 @@ fun NumberPickerBottomSheet(
             Text(
                 title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    color = NeonCyan,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    color = NeonCyan, fontWeight = FontWeight.Bold, letterSpacing = 1.sp
                 )
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                 IconButton(
                     onClick = { if (selected > min) selected-- },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(CardSurfaceElevated)
+                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(CardSurfaceElevated)
                 ) {
                     Icon(Icons.Default.Remove, contentDescription = null, tint = NeonCyan)
                 }
                 Text(
                     "$selected",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        color = NeonCyan,
-                        fontWeight = FontWeight.Black
-                    ),
+                    style = MaterialTheme.typography.displaySmall.copy(color = NeonCyan, fontWeight = FontWeight.Black),
                     modifier = Modifier.defaultMinSize(minWidth = 60.dp),
                     textAlign = TextAlign.Center
                 )
                 IconButton(
                     onClick = { if (selected < max) selected++ },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(CardSurfaceElevated)
+                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(8.dp)).background(CardSurfaceElevated)
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = NeonCyan)
                 }

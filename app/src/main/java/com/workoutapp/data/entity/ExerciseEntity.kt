@@ -8,6 +8,7 @@ data class ExerciseEntity(
     @PrimaryKey val id: String,
     val name: String,
     val muscleGroupId: String,
+    val subGroupId: String,
     val equipment: String,
     val defaultSets: Int,
     val defaultReps: Int,
@@ -20,5 +21,6 @@ data class ExerciseEntity(
     val isShoulderSafe: Boolean,
     val restSeconds: Int,
     val notes: String,
-    val sortOrder: Int = 0
+    val sortOrder: Int = 0,
+    val isTimeBased: Boolean = false
 )

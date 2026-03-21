@@ -38,8 +38,12 @@ fun RepsStepperControl(
     reps: Int,
     onRepsChange: (Int) -> Unit,
     accentColor: Color,
+    isTimeBased: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val step = if (isTimeBased) 5 else 1
+    val minValue = if (isTimeBased) 5 else 1
+
     val zone = remember(reps) { RepMaxCalculator.zone(reps) }
     val zoneColor = when (zone) {
         RepZone.STRENGTH     -> StrengthZoneColor
@@ -53,7 +57,7 @@ fun RepsStepperControl(
         modifier = modifier
     ) {
         Text(
-            "Reps",
+            if (isTimeBased) "sec" else "Reps",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -69,11 +73,11 @@ fun RepsStepperControl(
                     .size(28.dp)
                     .clip(CircleShape)
                     .background(accentColor.copy(alpha = 0.13f))
-                    .clickable(enabled = reps > 1) { onRepsChange(reps - 1) }
+                    .clickable(enabled = reps > minValue) { onRepsChange(reps - step) }
             ) {
                 Icon(
                     Icons.Default.Remove,
-                    contentDescription = "Decrease reps",
+                    contentDescription = if (isTimeBased) "Decrease seconds" else "Decrease reps",
                     tint = accentColor,
                     modifier = Modifier.size(14.dp)
                 )
@@ -83,7 +87,7 @@ fun RepsStepperControl(
                 text = "$reps",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = if (isTimeBased) accentColor else zoneColor
             )
 
             Box(
@@ -92,23 +96,78 @@ fun RepsStepperControl(
                     .size(28.dp)
                     .clip(CircleShape)
                     .background(accentColor.copy(alpha = 0.13f))
-                    .clickable { onRepsChange(reps + 1) }
+                    .clickable { onRepsChange(reps + step) }
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Increase reps",
+                    contentDescription = if (isTimeBased) "Increase seconds" else "Increase reps",
                     tint = accentColor,
                     modifier = Modifier.size(14.dp)
                 )
             }
         }
-        Spacer(modifier = Modifier.height(2.dp))
+    }
+}
+
+@Composable
+fun SetsStepperControl(
+    sets: Int,
+    onSetsChange: (Int) -> Unit,
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
         Text(
-            text = zone.label,
+            "Sets",
             style = MaterialTheme.typography.labelSmall,
-            fontSize = 9.sp,
-            color = zoneColor,
-            fontWeight = FontWeight.SemiBold
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(accentColor.copy(alpha = 0.13f))
+                    .clickable(enabled = sets > 1) { onSetsChange(sets - 1) }
+            ) {
+                Icon(
+                    Icons.Default.Remove,
+                    contentDescription = "Decrease sets",
+                    tint = accentColor,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+
+            Text(
+                text = "$sets",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = accentColor
+            )
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(accentColor.copy(alpha = 0.13f))
+                    .clickable(enabled = sets < 10) { onSetsChange(sets + 1) }
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Increase sets",
+                    tint = accentColor,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+        }
     }
 }

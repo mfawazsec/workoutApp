@@ -34,7 +34,7 @@ fun SuggestScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "SUGGEST",
+                        "TODAY'S SUGGESTION",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Black,
                             letterSpacing = 3.sp,
